@@ -1,1 +1,6 @@
-<render-layer></render-layer>
+<!-- draw the neighborhoods map -->
+<render-neighborhoods dimensions="dimensions" translate="translate"></render-neighborhoods>
+
+<span ng-if="layers">
+    <render-layer layers="layers" translate="translate"></render-layer> 
+</span> 

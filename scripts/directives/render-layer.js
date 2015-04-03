@@ -7,52 +7,50 @@
  * # renderLayer
  */
 angular.module('challengeApp')
-  .directive('renderLayer', [ '$log', '$window', function ($log, $window) {
+  .directive('renderLayer', [ '$log', function ($log) {
     return {
-      templateUrl: 'views/render-layer.html',
+      template: '',
       restrict: 'E',
       scope: {
-        layers: '='
+        layers: '=',
+        translate: '='
       },
       link: function postLink(scope, element, attrs) {
-          var width = $window.innerWidth,
-              height = $window.innerHeight;
 
-          // draw the svg
-          var svg = d3.select('#layer')
-                      .append('svg')
-                      .attr('width', width)
-                      .attr('height', height);
+          // Assuming the layers come in in the order we want them; we draw
+          //  one layer at a time called the draw method when the current is done
 
-          var d = '/data/topojson/neighborhoods.json';
+          var drawLayer = function(layer) {
+              var layerData = '/data/topojson/' + layer + '.json';
+              d3.json(layerData, function(error, data) {
+                  if (error) return $log.error(data);
+                  //$log.info(data);
 
+                  var features = topojson.feature(data, data.objects[layer]);
+                  $log.info(features);
+                  var projection = d3.geo.albers()
+                                     .scale(1)
+                                     .translate([0,0]);
 
-          d3.json(d, function(error, data) {
-              if (error) return $log.error(data);
-              //$log.info(data);
+                  var path = d3.geo.path().projection(projection);
 
-              var neighborhoods = topojson.feature(data, data.objects.neighborhoods);
-              var neighborhood = neighborhoods.features.filter(function(d) { return d.properties.neighborho === 'Twin Peaks'; });
-              $log.info(neighborhoods);
-              $log.info(neighborhood);
+                  projection.scale(scope.translate.scale).translate(scope.translate.transform);
 
-              var projection = d3.geo.albers()
-                                 .scale(1)
-                                 .translate([0,0]);
+                  d3.select('svg')
+                    .selectAll('.' + layer)
+                    .data(features.features)
+                    .enter()
+                    .append('path')
+                    .attr('class', layer)
+                    .attr('d', path);
 
-              var path = d3.geo.path().projection(projection);
+                  // draw the next layer
+                  if (scope.layers.length > 0) drawLayer(scope.layers.shift());
+              })
+          }
 
-              var b = path.bounds(neighborhoods),
-                  s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height),
-                  t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
-
-              projection.scale(s).translate(t);
-
-              svg.append('path')
-                 .datum(neighborhoods)
-                 .attr('class', 'path')
-                 .attr('d', path);
-          })
+          // kick off the drawing
+          drawLayer(scope.layers.shift());
       }
     };
   }]);

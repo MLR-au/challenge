@@ -26,3 +26,15 @@ body {
   stroke: red;
   fill: white;
 }
+
+.map-controls {
+    position: absolute;
+    z-index: 10;
+    top: 5px;
+    left: 5px;
+    padding: 15px;
+    background-color: #DBD7D2;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+
+}

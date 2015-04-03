@@ -9,9 +9,20 @@ body {
   padding: 0;
 }
 
-
-path {
-  stroke: 'red';
-  stroke-width: '1px';
-  fill: 'white';
+.neighborhoods {
+  stroke: black;
+  fill: white;
+}
+.streets {
+  stroke: #ccc;
+  fill: white;
+  opacity: 0.8;
+}
+.arteries {
+  stroke: blue;
+  fill: white;
+}
+.freeways {
+  stroke: red;
+  fill: white;
 }

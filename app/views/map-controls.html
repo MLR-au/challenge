@@ -2,8 +2,15 @@
 <hr/>
 
 <accordion>
-    <accordion-group heading="Help" is-open="true">
+    <accordion-group heading="Help">
     </accordion-group>
     <accordion-group heading="Bus Information">
+    </accordion-group>
+    <accordion-group heading="Agencies" is-open="true">
+        <div class="row" ng-repeat="agency in agencies">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <a href="" ng-click="showAgencyData(agency.tag)">{{agency.title}}</a>
+            </div>
+        </div>
     </accordion-group>
 </accordion>

@@ -21,7 +21,7 @@ angular.module('challengeApp')
           // then just iterate over the lot drawing them in one at a time
           //
           scope.layers = maps.mapData;
-          $log.debug(scope.layers);
+          //$log.debug(scope.layers);
 
           // i think the name gives it away, this determines the transform to be applied
           var calculateTransform = function(path, features) {

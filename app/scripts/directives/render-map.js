@@ -7,7 +7,7 @@
  * # renderMap
  */
 angular.module('challengeApp')
-  .directive('renderMap', [ '$window', '$log', 'maps', function ($window, $log, maps) {
+  .directive('renderMap', [ '$window', '$log', 'maps', 'busService', function ($window, $log, maps, bus) {
     return {
       templateUrl: 'views/render-map.html',
       restrict: 'E',
@@ -33,7 +33,7 @@ angular.module('challengeApp')
 
           // the available layers - these are in the order we want them retrieved
           //var layers = [ 'neighborhoods', 'streets', 'arteries', 'freeways' ];
-          var layers = [ 'neighborhoods', 'arteries', 'freeways' ];
+          var layers = [ 'neighborhoods' ];
           maps.get(layers);
 
           // render the layers upong receiving the signal that all the 
@@ -47,6 +47,7 @@ angular.module('challengeApp')
               // go ahead and render the layers then...
               scope.loading = false;
               scope.renderLayers = true;
+
           });
       }
     };

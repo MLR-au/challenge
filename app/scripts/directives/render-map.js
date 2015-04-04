@@ -33,7 +33,7 @@ angular.module('challengeApp')
 
           // the available layers - these are in the order we want them retrieved
           //var layers = [ 'neighborhoods', 'streets', 'arteries', 'freeways' ];
-          var layers = [ 'neighborhoods', 'streets', 'arteries', 'freeways' ];
+          var layers = [ 'neighborhoods', 'arteries', 'freeways' ];
           maps.get(layers);
 
           // render the layers upong receiving the signal that all the 

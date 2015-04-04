@@ -14,6 +14,10 @@ angular.module('challengeApp')
       scope: {
       },
       link: function postLink(scope, element, attrs) {
+
+          // show the loading indicator
+          scope.loading = true;
+
           // determine the size of the svg
           //  It should be as wide as the parent and as tall as the window
           var width = element[0].offsetParent.clientWidth - 30,
@@ -29,7 +33,7 @@ angular.module('challengeApp')
 
           // the available layers - these are in the order we want them retrieved
           //var layers = [ 'neighborhoods', 'streets', 'arteries', 'freeways' ];
-          var layers = [ 'neighborhoods', 'arteries', 'freeways' ];
+          var layers = [ 'neighborhoods', 'streets', 'arteries', 'freeways' ];
           maps.get(layers);
 
           // render the layers upong receiving the signal that all the 
@@ -41,6 +45,7 @@ angular.module('challengeApp')
               }
 
               // go ahead and render the layers then...
+              scope.loading = false;
               scope.renderLayers = true;
           });
       }

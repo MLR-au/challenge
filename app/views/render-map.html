@@ -1,6 +1,11 @@
 
-<!-- this is where the SVG is drawn -->
-<div id="map"></div>
+<span ng-show="loading">
+    <p class="text-center">loading...</p>
+</span>
+<span ng-show="!loading">
+    <!-- this is where the SVG is drawn -->
+    <div id="map"></div>
 
-<!-- render the layers -->
-<render-layer ng-if="renderLayers" dimensions="dimensions"></render-layer>
+    <!-- render the layers -->
+    <render-layer ng-if="renderLayers" dimensions="dimensions"></render-layer>
+</span>

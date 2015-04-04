@@ -17,12 +17,6 @@ angular.module('challengeApp')
       //  render back via this object
       $scope.translate = {};
 
-      // add the svg
-      d3.select('body')
-        .append('svg')
-        .attr('width', width)
-        .attr('height', height);
-
       // define the dimensions of the svg; the layers need this to compute
       //  the center
       $scope.dimensions = { 'width': width, 'height': height }

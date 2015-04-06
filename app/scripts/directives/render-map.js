@@ -7,7 +7,8 @@
  * # renderMap
  */
 angular.module('challengeApp')
-  .directive('renderMap', [ '$window', '$log', 'maps', 'busService', function ($window, $log, maps, bus) {
+  .directive('renderMap', [ '$window', '$log', 'maps', 'busService', 'configuration', 
+        function ($window, $log, maps, bus, conf) {
     return {
       templateUrl: 'views/render-map.html',
       restrict: 'E',
@@ -32,9 +33,7 @@ angular.module('challengeApp')
           $log.info('SVG appended to div.');
 
           // the available layers - these are in the order we want them retrieved
-          //var layers = [ 'neighborhoods', 'streets', 'arteries', 'freeways' ];
-          var layers = [ 'neighborhoods', 'arteries', 'freeways' ];
-          maps.get(layers);
+          maps.get(conf.layers);
 
           // render the layers upong receiving the signal that all the 
           //  required data has been retrieved.

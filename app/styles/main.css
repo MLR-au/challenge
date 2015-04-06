@@ -39,3 +39,7 @@ body {
     border-radius: 2px;
 
 }
+
+del a:link, del a:active, del a:visited {
+    color: #ccc;
+}

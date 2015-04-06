@@ -45,9 +45,10 @@ angular.module('challengeApp')
           }
           
           // widget controls
-          //scope.showAgencyData = function(tag) {
-          //    $log.info(_.find(bus.agencies, function(d) { return d.tag === tag; }));
-          //}
+          scope.selectRoute = function(tag) {
+              $log.info('D:map-controls; selectRoute, selected', tag);
+              bus.toggleRoute(tag);
+          }
 
       }
     };

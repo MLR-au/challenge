@@ -8,13 +8,14 @@
  * Service in the challengeApp.
  */
 angular.module('challengeApp')
-  .service('busService', [ '$rootScope', '$log', '$resource', 'maps', function ($rootScope, $log, $resource, maps) {
+  .service('busService', [ '$rootScope', '$log', '$resource', 'maps', 'configuration', 
+        function ($rootScope, $log, $resource, maps, conf) {
     // AngularJS will instantiate a singleton by calling "new" on this function
     //
       
       // helper to minimise the number of times I need to write
       //  getAttribute to..... 1
-      function get(o, attributeList) {
+      function get(o, attributeList, optionalMap) {
           var d = {};
           angular.forEach(attributeList, function(v,k) {
               d[v] = o.getAttribute(v);
@@ -22,7 +23,7 @@ angular.module('challengeApp')
 
           // this will be an object keyed on the attributes attributeList
           //  with the corresponding value extracted from the node
-          return d;
+          return _.extend(d, optionalMap);
       }
 
       // get the list of agencies
@@ -31,14 +32,14 @@ angular.module('challengeApp')
           var routes = bus.resource.get({ 'command': 'routeList' }, function() {
 
               // construct the array of routes;
-              _.each(routes.nodes, function(d) { bus.routes.push(get(d, ['tag', 'title'])); });
+              _.each(routes.nodes, function(d) { bus.routes.push(get(d, ['tag', 'title'], { 'selected': true })); });
 
               // to make things easier when getting the locations, extract the tags
               //  out into an array
               bus.routeTags = _.pluck(bus.routes, 'tag');
 
               //
-              //$log.debug('S:bus-service; getRoutes; routes', bus.routes);
+              $log.debug('S:bus-service; getRoutes; routes', bus.routes);
               //$log.debug('S:bus-service; getRoutes; routeTags', bus.routeTags);
 
               // now that we have the routes we can get the vehicle locations
@@ -110,8 +111,28 @@ angular.module('challengeApp')
           })
 
           // update map
+          //$log.debug('S:bus-service; updateVehicleData, bus.locations', bus.locations);
           renderVehicleLocations();
+      }
 
+      function toggleRoute(tag) {
+          if (bus.selectedRoutes.indexOf(tag) === -1) {
+              // not currently selected so add it
+              bus.selectedRoutes.push(tag);
+          } else {
+              // currently selected so remove it
+              bus.selectedRoutes.splice(bus.selectedRoutes.indexOf(tag), 1);
+          }
+
+          angular.forEach(bus.routes, function(v,k) {
+              // mark those that are selected
+              if (!_.isEmpty(bus.selectedRoutes)) {
+                  bus.routes[k].selected = bus.selectedRoutes.indexOf(v.tag) === -1 ? false : true;
+              } else {
+                  bus.routes[k].selected = true;
+              }
+
+          })
       }
 
       // draw in the locations of the busses.
@@ -136,8 +157,6 @@ angular.module('challengeApp')
             .attr('r', '6')
             .attr('transform', function(d) { return 'translate(' + bus.projection([d.lon, d.lat]) + ')'; })
             .style('fill', function(d) { return color(d.routeTag); });
-
-
       }
 
       var bus = {
@@ -146,6 +165,7 @@ angular.module('challengeApp')
           routeTags: [],
           locations: [],
           routeLocationsLastTime: {},
+          selectedRoutes: [],
 
           // ng-resource: resource service
           resource: $resource('http://webservices.nextbus.com/service/publicXMLFeed?command=:command&a=sf-muni', {}, {
@@ -164,6 +184,7 @@ angular.module('challengeApp')
           // methods
           getRoutes: getRoutes,
           getVehicleLocations: getVehicleLocations,
+          toggleRoute: toggleRoute,
       }
       return bus;
   }]);

@@ -10,9 +10,16 @@
         <accordion-group heading="Routes" is-open="true">
             <div class="row" ng-repeat="route in routes">
                 <div class="col-sm-12 col-md-12 col-lg-12">
-                    <a href="" ng-click="showAgencyData(route.tag)">
-                        {{route.title}} ({{route.tag}})
-                    </a>
+                    <span ng-if="route.selected">
+                        <a href="" ng-click="selectRoute(route.tag)">
+                            {{route.title}} ({{route.tag}})
+                        </a>
+                    </span>
+                    <del ng-if="!route.selected" ng-click="selectRoute(route.tag)">
+                        <a href="" ng-click="selectRoute(route.tag)">
+                            {{route.title}} ({{route.tag}})
+                        </a>
+                    </del>
                 </div>
             </div>
         </accordion-group>

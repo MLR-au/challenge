@@ -14,49 +14,37 @@ angular.module('challengeApp')
       
       // helper to minimise the number of times I need to write
       //  getAttribute to..... 1
-      function get(o, attr) {
-          return o.getAttribute(attr);
+      function get(o, attributeList) {
+          var d = {};
+          angular.forEach(attributeList, function(v,k) {
+              d[v] = o.getAttribute(v);
+          })
+
+          // this will be an object keyed on the attributes attributeList
+          //  with the corresponding value extracted from the node
+          return d;
       }
 
       // get the list of agencies
-      function getAgencies() {
-          bus.agencies = [];
-          var agencies = bus.resource.get({ 'command': 'agencyList' }, function() {
-              angular.forEach(agencies.nodes, function(v,k) {
+      function getRoutes() {
+          bus.routes = [];
+          var routes = bus.resource.get({ 'command': 'routeList' }, function() {
+              angular.forEach(routes.nodes, function(v,k) {
                   // extract the tag - we need it for later
                   var tag = get(v, 'tag');
                   
                   // push the bus data out
-                  bus.agencies.push({
-                      'tag': tag,
-                      'title': get(v, 'title'),
-                      'regionTitle': get(v, 'regionTitle') 
-                  });
+                  bus.routes.push(get(v, [ 'tag', 'title' ]));
 
                   // get the agency data
-                  bus.getAgencyInfo(tag);
+                  //bus.getAgencyInfo(tag);
               })
-              //$log.info(bus.agencies);
-          });
-      }
-
-      function getAgencyInfo(tag) {
-          var routes = bus.resource.get({ 'command': 'routeList', 'a': tag }, function() {
-              var r = [] 
-              angular.forEach(routes.nodes, function(v,k) {
-                  r.push({ 
-                      'tag': get(v, 'tag'),
-                      'title': get(v, 'title')
-                  });
-              })
-
-              // add the routes list into the appropriate agency object
-              var a = _.find(bus.agencies, function(d) { return d.tag === tag; }).routes = r;
+              $log.debug('S:bus-service; getRoutes; routes', bus.routes);
           });
       }
 
       var bus = {
-          resource: $resource('http://webservices.nextbus.com/service/publicXMLFeed?command=:command', {}, {
+          resource: $resource('http://webservices.nextbus.com/service/publicXMLFeed?command=:command&a=sf-muni', {}, {
               get: { 
                   command: '@command',
                   transformResponse: function(d) {
@@ -68,8 +56,7 @@ angular.module('challengeApp')
                   }
               },
           }),
-          getAgencies: getAgencies,
-          getAgencyInfo: getAgencyInfo,
+          getRoutes: getRoutes,
       }
       return bus;
   }]);

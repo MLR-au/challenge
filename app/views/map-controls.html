@@ -1,16 +1,20 @@
-<h4 class="text-center">San Francisco Bus Monitor</h4>
-<hr/>
+<div ng-style="mapControlStyle">
+    <h4 class="text-center">San Francisco Bus Monitor</h4>
+    <hr/>
 
-<accordion>
-    <accordion-group heading="Help">
-    </accordion-group>
-    <accordion-group heading="Bus Information">
-    </accordion-group>
-    <accordion-group heading="Agencies" is-open="true">
-        <div class="row" ng-repeat="agency in agencies">
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                <a href="" ng-click="showAgencyData(agency.tag)">{{agency.title}}</a>
+    <accordion>
+        <accordion-group heading="Help">
+        </accordion-group>
+        <accordion-group heading="Bus Information">
+        </accordion-group>
+        <accordion-group heading="Routes" is-open="true">
+            <div class="row" ng-repeat="route in routes">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <a href="" ng-click="showAgencyData(route.tag)">
+                        {{route.title}} ({{route.tag}})
+                    </a>
+                </div>
             </div>
-        </div>
-    </accordion-group>
-</accordion>
+        </accordion-group>
+    </accordion>
+</div>

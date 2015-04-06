@@ -5,6 +5,10 @@
  * @name challengeApp.directive:renderLayer
  * @description
  * # renderLayer
+ *
+ * Resources: http://bost.ocks.org/mike/map/
+ *            https://github.com/mbostock/d3/wiki/Geo-Projections
+ *            http://stackoverflow.com/a/14691788
  */
 angular.module('challengeApp')
   .directive('renderLayer', [ '$log', 'maps', function ($log, maps) {
@@ -24,6 +28,9 @@ angular.module('challengeApp')
           //$log.debug(scope.layers);
 
           // i think the name gives it away, this determines the transform to be applied
+          //  and we'll base the transform on the map itself so it scale to 95% and translates
+          //  to the right place. And credit where it's due:
+          //  http://stackoverflow.com/a/14691788
           var calculateTransform = function(path, features) {
               var b = path.bounds(features),
                   s = .95 / Math.max((b[1][0] - b[0][0]) / scope.dimensions.width, (b[1][1] - b[0][1]) / scope.dimensions.height),
@@ -44,7 +51,7 @@ angular.module('challengeApp')
               //$log.debug(features);
 
               // create a projection
-              var projection = d3.geo.albers()
+              var projection = d3.geo.mercator()
                                  .scale(1)
                                  .translate([0,0]);
 

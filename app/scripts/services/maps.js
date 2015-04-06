@@ -36,7 +36,10 @@ angular.module('challengeApp')
     }
 
     var maps = {
+        //  instance variables
         mapData: [],
+
+        // methods
         get: get,
     };
     return maps;

@@ -11,7 +11,7 @@
  *            http://stackoverflow.com/a/14691788
  */
 angular.module('challengeApp')
-  .directive('renderLayer', [ '$log', 'maps', function ($log, maps) {
+  .directive('renderLayer', [ '$rootScope', '$log', 'maps', 'busService', function ($rootScope, $log, maps, bus) {
     return {
       template: '',
       restrict: 'E',
@@ -41,6 +41,9 @@ angular.module('challengeApp')
                   scale: s,
                   translate: t
               }
+              
+              // stash this in the bus service so we can use it to draw the vehicle locations
+              //bus.transform = scope.transform;
           }
           
           var drawLayer = function(layer, which) {
@@ -64,6 +67,10 @@ angular.module('challengeApp')
               // transform the projection
               projection.scale(scope.transform.scale).translate(scope.transform.translate);
 
+              // and stash the transformed projection in the bus service because we'll need it there
+              //  to draw the vehicle locations on the map
+              bus.projection = projection;
+
               // draw the layer
               d3.select('svg')
                 .selectAll('.' + layer.name)
@@ -74,7 +81,12 @@ angular.module('challengeApp')
                 .attr('d', path);
 
               // next
-              if (!_.isEmpty(scope.layers)) drawLayer(scope.layers.shift());
+              if (!_.isEmpty(scope.layers)) {
+                  drawLayer(scope.layers.shift());
+              } else {
+                  // when the layers array is empty all maps have been drawn
+                  $rootScope.$broadcast('all-map-layers-drawn');
+              }
           }
 
           // kick off the drawing

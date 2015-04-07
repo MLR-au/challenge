@@ -8,8 +8,8 @@
  * Service in the challengeApp.
  */
 angular.module('challengeApp')
-  .service('busService', [ '$rootScope', '$log', '$resource', 'maps', 'configuration', 
-        function ($rootScope, $log, $resource, maps, conf) {
+  .service('busService', [ '$rootScope', '$log', '$resource', 'maps', 'renderingService', 'configuration', 
+        function ($rootScope, $log, $resource, maps, render, conf) {
     // AngularJS will instantiate a singleton by calling "new" on this function
       
 
@@ -127,7 +127,7 @@ angular.module('challengeApp')
 
           // update map
           //$log.debug('S:bus-service; updateVehicleData, bus.locations', bus.locations);
-          renderVehicleLocations();
+          render.renderVehicleLocations(bus.locations);
       }
 
       function toggleRoute(tag) {
@@ -135,28 +135,11 @@ angular.module('challengeApp')
           if (bus.selectedRoutes.indexOf(tag) === -1) {
               // not currently selected so add it
               bus.selectedRoutes.push(tag);
-          } else {
-              // currently selected so remove it
-              bus.selectedRoutes.splice(bus.selectedRoutes.indexOf(tag), 1);
-          }
 
-          // cycle through the routes toggling on or off as required
-          angular.forEach(bus.routes, function(v,k) {
-              // mark those that are selected
-              if (!_.isEmpty(bus.selectedRoutes)) {
-                  bus.routes[k].selected = bus.selectedRoutes.indexOf(v.tag) === -1 ? false : true;
-              } else {
-                  bus.routes[k].selected = true;
-              }
-
-          })
-          
-          // get route paths for selected routes
-          angular.forEach(bus.selectedRoutes, function(v,k) {
               // download paths and stops if we don't yet have them for the selected route
               //  Basically, anytime a route is selected we add paths and stops to the routes object
-              if (_.isEmpty(bus.routes[v].paths)) {
-                  var routeConfigs = bus.resource.get({ 'command': 'routeConfig', 'r': v }, function() {
+              if (_.isEmpty(bus.routes[tag].paths)) {
+                  var routeConfigs = bus.resource.get({ 'command': 'routeConfig', 'r': tag  }, function() {
                       // $log.info('S:bus-service; toggleRoute; paths & stops', routeConfigs);
                       var nodes = _.groupBy(getNodes(routeConfigs.nodes[0].outerHTML).nodes, function(d) {
                           return d.localName;
@@ -169,40 +152,45 @@ angular.module('challengeApp')
                       // get the path data into a useable form
                       _.each(nodes.path, function(d) { paths.push(getNodes(d.outerHTML).nodes); });
                       _.each(paths, function(d,i) { 
-                          paths[i] = _.map(d, function(e) { return get(e, [ 'lat', 'lon' ]); }) 
+                          paths[i] = _.map(d, function(e) { 
+                              var f = get(e, [ 'lat', 'lon' ]); 
+                                  return [ f.lon, f.lat ];
+                              }) 
                       });
                       
                       // stash the data
                       bus.routes[tag].paths = paths;
                       bus.routes[tag].stops = stops;
                       //$log.debug('S:bus-service, toggleRoute, routeData', bus.routes[tag]);
+                      
+                      // now that we have this path go ahead and render it
+                      render.renderPaths(tag, bus.routes[tag].paths);
                   })
+              } else {
+                  // we already have this path so go ahead and render it
+                  render.renderPaths(tag, bus.routes[tag].paths);
               }
-          });
-      }
 
-      // draw in the locations of the busses.
-      function renderVehicleLocations() {
-          var color = d3.scale.category20();
+          } else {
+              // currently selected so remove it
+              bus.selectedRoutes.splice(bus.selectedRoutes.indexOf(tag), 1);
 
-          // transition existing markers
-          d3.select('svg')
-            .selectAll('circle')
-            .data(bus.locations)
-            .transition()
-            .duration(1000)
-            .attr('transform', function(d) { return 'translate(' + bus.projection([d.lon, d.lat]) + ')'; });
+              // since we know a path is drawn; select it and remove it
+              d3.selectAll(".path_route_" + tag).remove();
+          }
 
-          // draw in new location markers
-          d3.select('svg')
-            .selectAll('circle')
-            .data(bus.locations)
-            .enter()
-            .append('circle')
-            .attr('class', 'circle')
-            .attr('r', '6')
-            .attr('transform', function(d) { return 'translate(' + bus.projection([d.lon, d.lat]) + ')'; })
-            .style('fill', function(d) { return color(d.routeTag); });
+          // cycle through the routes toggling on or off as required
+          angular.forEach(bus.routes, function(v,k) {
+              // mark those that are selected
+              if (!_.isEmpty(bus.selectedRoutes)) {
+                  bus.routes[k].selected = bus.selectedRoutes.indexOf(v.tag) === -1 ? false : true;
+              } else {
+                  bus.routes[k].selected = true;
+              }
+          })
+
+          // toggle bus visibility or not
+          render.toggleBusVisibility(bus.selectedRoutes);
       }
 
       var bus = {

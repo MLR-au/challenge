@@ -27,6 +27,10 @@ body {
   stroke: red;
   fill: white;
 }
+.bus-routes {
+    stroke-width: 2px;
+    fill: white;
+}
 
 .map-controls {
     position: absolute;

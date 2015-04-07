@@ -7,8 +7,8 @@
  * # renderMap
  */
 angular.module('challengeApp')
-  .directive('renderMap', [ '$window', '$log', 'maps', 'busService', 'configuration', 
-        function ($window, $log, maps, bus, conf) {
+  .directive('renderMap', [ '$window', '$log', 'maps', 'configuration', 
+        function ($window, $log, maps, conf) {
     return {
       templateUrl: 'views/render-map.html',
       restrict: 'E',

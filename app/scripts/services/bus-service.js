@@ -11,11 +11,21 @@ angular.module('challengeApp')
   .service('busService', [ '$rootScope', '$log', '$resource', 'maps', 'configuration', 
         function ($rootScope, $log, $resource, maps, conf) {
     // AngularJS will instantiate a singleton by calling "new" on this function
-    //
       
+
+      // given an xml string - d - return the child nodes
+      //  minus any text nodes
+      function getNodes(d) {
+          var parser = new DOMParser();
+          var xmldoc = parser.parseFromString(d, "text/xml");
+          var nodes = _.reject(xmldoc.documentElement.childNodes, function(n) { return n.nodeType === Node.TEXT_NODE; });
+
+          return { 'nodes': nodes };
+      }
+
       // helper to minimise the number of times I need to write
       //  getAttribute to..... 1
-      function get(o, attributeList, optionalMap) {
+      function get(o, attributeList, extra) {
           var d = {};
           angular.forEach(attributeList, function(v,k) {
               d[v] = o.getAttribute(v);
@@ -23,7 +33,7 @@ angular.module('challengeApp')
 
           // this will be an object keyed on the attributes attributeList
           //  with the corresponding value extracted from the node
-          return _.extend(d, optionalMap);
+          return _.extend(d, extra);
       }
 
       // get the list of agencies
@@ -32,14 +42,19 @@ angular.module('challengeApp')
           var routes = bus.resource.get({ 'command': 'routeList' }, function() {
 
               // construct the array of routes;
-              _.each(routes.nodes, function(d) { bus.routes.push(get(d, ['tag', 'title'], { 'selected': true })); });
+              _.each(routes.nodes, function(d) { 
+                  var data = get(d, ['tag', 'title'], { 'selected': true, 'paths': [], 'stops': [] });
+                  bus.routes[data.tag] = data;
+              });
 
               // to make things easier when getting the locations, extract the tags
               //  out into an array
               bus.routeTags = _.pluck(bus.routes, 'tag');
 
-              //
-              $log.debug('S:bus-service; getRoutes; routes', bus.routes);
+              // and create a data array keyed on tag to sore route data
+
+
+              //$log.debug('S:bus-service; getRoutes; routes', bus.routes);
               //$log.debug('S:bus-service; getRoutes; routeTags', bus.routeTags);
 
               // now that we have the routes we can get the vehicle locations
@@ -57,7 +72,7 @@ angular.module('challengeApp')
           var q = [];
 
           // get the locations for all vehicles on all routes
-          angular.forEach(bus.routeTags, function(v,k) {
+          angular.forEach(bus.routeTags.slice(0,10), function(v,k) {
               var routeTag = v;
 
               // we need to know when all the data has been retrieved and since it's asynchronous
@@ -116,6 +131,7 @@ angular.module('challengeApp')
       }
 
       function toggleRoute(tag) {
+          // add or remove the tag from our list
           if (bus.selectedRoutes.indexOf(tag) === -1) {
               // not currently selected so add it
               bus.selectedRoutes.push(tag);
@@ -124,6 +140,7 @@ angular.module('challengeApp')
               bus.selectedRoutes.splice(bus.selectedRoutes.indexOf(tag), 1);
           }
 
+          // cycle through the routes toggling on or off as required
           angular.forEach(bus.routes, function(v,k) {
               // mark those that are selected
               if (!_.isEmpty(bus.selectedRoutes)) {
@@ -133,6 +150,35 @@ angular.module('challengeApp')
               }
 
           })
+          
+          // get route paths for selected routes
+          angular.forEach(bus.selectedRoutes, function(v,k) {
+              // download paths and stops if we don't yet have them for the selected route
+              //  Basically, anytime a route is selected we add paths and stops to the routes object
+              if (_.isEmpty(bus.routes[v].paths)) {
+                  var routeConfigs = bus.resource.get({ 'command': 'routeConfig', 'r': v }, function() {
+                      // $log.info('S:bus-service; toggleRoute; paths & stops', routeConfigs);
+                      var nodes = _.groupBy(getNodes(routeConfigs.nodes[0].outerHTML).nodes, function(d) {
+                          return d.localName;
+                      });
+                      var stops = [], paths = [];
+
+                      // get the stop data into a useable form
+                      _.each(nodes.stop, function(d) { stops.push(get(d, [ 'tag', 'title', 'lat', 'lon', 'stopId' ])); });
+
+                      // get the path data into a useable form
+                      _.each(nodes.path, function(d) { paths.push(getNodes(d.outerHTML).nodes); });
+                      _.each(paths, function(d,i) { 
+                          paths[i] = _.map(d, function(e) { return get(e, [ 'lat', 'lon' ]); }) 
+                      });
+                      
+                      // stash the data
+                      bus.routes[tag].paths = paths;
+                      bus.routes[tag].stops = stops;
+                      //$log.debug('S:bus-service, toggleRoute, routeData', bus.routes[tag]);
+                  })
+              }
+          });
       }
 
       // draw in the locations of the busses.
@@ -161,23 +207,17 @@ angular.module('challengeApp')
 
       var bus = {
           // instance variables
-          routes: [],
+          routes: {},
           routeTags: [],
           locations: [],
           routeLocationsLastTime: {},
           selectedRoutes: [],
 
           // ng-resource: resource service
-          resource: $resource('http://webservices.nextbus.com/service/publicXMLFeed?command=:command&a=sf-muni', {}, {
+          resource: $resource('http://webservices.nextbus.com/service/publicXMLFeed?a=sf-muni', {}, {
               get: { 
                   command: '@command',
-                  transformResponse: function(d) {
-                      var parser = new DOMParser();
-                      var xmldoc = parser.parseFromString(d, "text/xml");
-                      var nodes = _.reject(xmldoc.documentElement.childNodes, function(n) { return n.nodeType === Node.TEXT_NODE; });
-
-                      return { 'nodes': nodes };
-                  }
+                  transformResponse: getNodes 
               },
           }),
 

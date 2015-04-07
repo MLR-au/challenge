@@ -10,7 +10,7 @@
 angular.module('challengeApp')
   .constant('configuration', {
       //'layers': [ 'neighborhoods', 'streets', 'arteries', 'freeways' ],
-      'layers': [ 'neighborhoods', 'arteries', 'freeways' ]
+      'layers': [ 'neighborhoods' ]
 
 
   });

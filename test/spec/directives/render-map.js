@@ -5,18 +5,19 @@ describe('Directive: renderMap', function () {
   // load the directive's module
   beforeEach(module('challengeApp'));
 
-  var element,
-    scope;
+  var element, $compile, $rootScope;
 
-  beforeEach(inject(function ($rootScope) {
-    scope = $rootScope.$new();
+  // load the template
+  beforeEach(module("my.templates"));
+
+  beforeEach(inject(function (_$rootScope_, _$compile_) {
+      $compile = _$compile_;
+      $rootScope = _$rootScope_;
   }));
 
-  /*
-  it('should make hidden element visible', inject(function ($compile) {
-    element = angular.element('<render-map></render-map>');
-    element = $compile(element)(scope);
-    expect(element.text()).toBe('this is the renderMap directive');
+  it('', inject(function () {
+      element = angular.element('<div class="row"><render-map></render-map></div>');
+      element = $compile(element)($rootScope);
+
   }));
-  */
 });

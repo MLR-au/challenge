@@ -13,6 +13,7 @@ angular.module('challengeApp')
     function get(layers) {
         if (! _.isArray(layers)) layers = [layers];
 
+        console.log($location.path);
         var layer = layers.shift();
         var p = $location.path();
         if (p !== '/') {

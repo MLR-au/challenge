@@ -15,6 +15,9 @@ angular.module('challengeApp')
         if (! _.isArray(layers)) layers = [layers];
 
         var layer = layers.shift();
+        maps.loadingMessage = 'loading ' + layer + '...';
+        $rootScope.$broadcast('loading-map');
+
         if (conf.path) {
             var url = conf.path + '/data/topojson/' + layer + '.json';
         } else {

@@ -49,6 +49,10 @@ angular.module('challengeApp')
               scope.renderLayers = true;
 
           });
+
+          scope.$on('loading-map', function() {
+              scope.loadingMessage = maps.loadingMessage;
+          })
       }
     };
   }]);

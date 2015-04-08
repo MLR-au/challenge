@@ -31,7 +31,8 @@
                                 <strong>No buses scheduled.</strong>
                             </span>
                             <span ng-if="!nextBus.noneScheduled">
-                                <strong>{{nextBus.title}}: </strong>{{nextBus.predictions[0].minutes}} min<br/>
+                                <strong>{{nextBus.stopId}}: {{nextBus.stopTitle}}</strong><br/>
+                                {{nextBus.title}}: {{nextBus.predictions[0].minutes}} min<br/>
                                 Affected By Layover: {{nextBus.predictions[0].affectedByLayover}}
                             </span>
                         </span>

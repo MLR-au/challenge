@@ -204,6 +204,7 @@ angular.module('challengeApp')
 
       function getStopNextBus(routeTag, stopId) {
         var predictions = bus.resource.get({ 'command': 'predictions', 'r': routeTag, 's': stopId, 'useShortTitles': true }, function() {
+            var stop = get(predictions.nodes[0], [ 'stopTitle', 'stopTag' ]);
             var nodes = _.groupBy(getNodes(predictions.nodes[0].outerHTML).nodes, function(d) {
                 return d.localName;
             })
@@ -220,7 +221,9 @@ angular.module('challengeApp')
                 // stash the data
                 bus.nextBus = {
                     'title': directionTitle.title,
-                    'predictions': nextBusPredictions
+                    'predictions': nextBusPredictions,
+                    'stopTitle': stop.stopTitle,
+                    'stopId': stop.stopTag
                 }
             } catch (e) {
                 // stash the data

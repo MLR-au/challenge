@@ -12,7 +12,10 @@ angular.module('challengeApp')
       'layers': [ 'neighborhoods', 'streets', 'arteries', 'freeways' ],
       //'layers': [ 'neighborhoods' ],
 
-      'colour': d3.scale.category20()
+      'colour': d3.scale.category20(),
+
+      // if the app is not installed at the root
+      'path': '/challenge'
 
 
   });

@@ -8,19 +8,18 @@
  * Service in the challengeApp.
  */
 angular.module('challengeApp')
-  .service('maps', [ '$http', '$log', '$rootScope', '$location', function ($http, $log, $rootScope, $location) {
+  .service('maps', [ '$http', '$log', '$rootScope', '$location', 'configuration',
+        function ($http, $log, $rootScope, $location, conf) {
     // AngularJS will instantiate a singleton by calling "new" on this function
     function get(layers) {
         if (! _.isArray(layers)) layers = [layers];
 
         var layer = layers.shift();
-        var p = $location.path();
-        if (p !== '/') {
-            var url = p + '/data/topojson/' + layer + '.json';
+        if (conf.path) {
+            var url = conf.path + '/data/topojson/' + layer + '.json';
         } else {
             var url = '/data/topojson/' + layer + '.json';
         }
-        console.log($location.path(), url);
         $http.get(url).then(function(resp) {
             //$log.debug(layer, resp.data);
             $log.info("Getting layer: ", layer);

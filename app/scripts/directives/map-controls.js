@@ -46,6 +46,10 @@ angular.module('challengeApp')
               }, 15000);
           });
 
+          scope.$on('toggle-route', function() {
+              scope.selectRoute(render.busesClicked.shift());
+          })
+
           scope.update = function() {
               bus.getVehicleLocations();
               $timeout(function() {
@@ -57,7 +61,6 @@ angular.module('challengeApp')
           scope.selectRoute = function(tag) {
               //$log.debug('D:map-controls; selectRoute, selected', tag);
               bus.toggleRoute(tag);
-
           }
 
 /*

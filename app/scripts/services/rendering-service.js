@@ -8,7 +8,7 @@
  * Service in the challengeApp.
  */
 angular.module('challengeApp')
-  .service('renderingService', [ '$log', 'configuration', function ($log, conf) {
+  .service('renderingService', [ '$rootScope', '$log', 'configuration', function ($rootScope, $log, conf) {
 
       // draw in the locations of the busses.
       function renderVehicleLocations(locations) {
@@ -29,15 +29,31 @@ angular.module('challengeApp')
            .attr('class', function(d) { 
                return 'circle bus_route_' + d.routeTag;
            })
-           .attr('r', '6')
+           .attr('r', function(d) {
+                if (_.isEmpty(render.selected)) {
+                    return '6';
+                } else {
+                    return '10';
+                }
+           })
            .attr('transform', function(d) { return 'translate(' + render.projection([d.lon, d.lat]) + ')'; })
-           .style('fill', function(d) { return conf.colour(d.routeTag); })
+           .style('fill', function(d) { 
+                if (_.isEmpty(render.selected)) {
+                    return conf.colour(d.routeTag);
+                }
+           })
            .style('visibility', function(d) { 
                 if (_.isEmpty(render.selected)) {
                     return 'visible';
                 } else {
                     return render.selected.indexOf(d.routeTag) === -1 ? 'hidden' : 'visible'; 
                 }
+           })
+           .on('click', function(d) {
+               $rootScope.$apply(function() {
+                   render.busesClicked.push(d.routeTag); 
+                   $rootScope.$broadcast('toggle-route');
+               });
            });
       }
 
@@ -85,6 +101,7 @@ angular.module('challengeApp')
 
       var render = {
           selected: [],
+          busesClicked: [],
           renderVehicleLocations: renderVehicleLocations,
           renderPaths: renderPaths,
           toggleBusVisibility: toggleBusVisibility,

@@ -12,9 +12,11 @@ describe('Directive: renderMap', function () {
     scope = $rootScope.$new();
   }));
 
+  /*
   it('should make hidden element visible', inject(function ($compile) {
     element = angular.element('<render-map></render-map>');
     element = $compile(element)(scope);
     expect(element.text()).toBe('this is the renderMap directive');
   }));
+  */
 });

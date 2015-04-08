@@ -12,9 +12,9 @@ describe('Directive: mapControls', function () {
     scope = $rootScope.$new();
   }));
 
-  it('should make hidden element visible', inject(function ($compile) {
-    element = angular.element('<map-controls></map-controls>');
-    element = $compile(element)(scope);
-    expect(element.text()).toBe('this is the mapControls directive');
-  }));
+//  it('should make hidden element visible', inject(function ($compile) {
+//    element = angular.element('<map-controls></map-controls>');
+//    element = $compile(element)(scope);
+//    expect(element.text()).toBe('this is the mapControls directive');
+//  }));
 });

@@ -200,10 +200,39 @@ angular.module('challengeApp')
                   bus.routes[k].selected = true;
               }
           })
-
-
       }
 
+      function getStopNextBus(routeTag, stopId) {
+        var predictions = bus.resource.get({ 'command': 'predictions', 'r': routeTag, 's': stopId, 'useShortTitles': true }, function() {
+            var nodes = _.groupBy(getNodes(predictions.nodes[0].outerHTML).nodes, function(d) {
+                return d.localName;
+            })
+
+            // extract the title
+            try {
+                var directionTitle = get(nodes.direction[0], ['title']);
+
+                // get the predictions from the node
+                var ps = getNodes(nodes.direction[0].outerHTML).nodes;
+                var nextBusPredictions = [];
+                _.each(ps, function(d) { nextBusPredictions.push(get(d, ['minutes', 'affectedByLayover'])); });
+
+                // stash the data
+                bus.nextBus = {
+                    'title': directionTitle.title,
+                    'predictions': nextBusPredictions
+                }
+            } catch (e) {
+                // stash the data
+                bus.nextBus = {
+                    'noneScheduled': true
+                }
+            }
+
+            $rootScope.$broadcast('bus-prediction-ready');
+
+        })
+      }
       var bus = {
           // instance variables
           routes: {},
@@ -211,6 +240,7 @@ angular.module('challengeApp')
           locations: [],
           routeLocationsLastTime: {},
           selectedRoutes: [],
+          nextBus: {},
 
           // ng-resource: resource service
           resource: $resource('http://webservices.nextbus.com/service/publicXMLFeed?a=sf-muni', {}, {
@@ -224,6 +254,8 @@ angular.module('challengeApp')
           getRoutes: getRoutes,
           getVehicleLocations: getVehicleLocations,
           toggleRoute: toggleRoute,
+          getStopNextBus: getStopNextBus,
       }
+
       return bus;
   }]);

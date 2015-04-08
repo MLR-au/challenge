@@ -46,61 +46,20 @@ angular.module('challengeApp')
               }, 15000);
           });
 
-          scope.$on('toggle-route', function() {
-              scope.selectRoute(render.busesClicked.shift());
-          })
-
           scope.update = function() {
               bus.getVehicleLocations();
               $timeout(function() {
                   scope.update();
               }, 15000);
           }
+
+          scope.$on('toggle-route', function() {
+              scope.selectRoute(render.busesClicked.shift());
+          })
+          scope.$on('bus-prediction-ready', function() {
+              scope.nextBus = bus.nextBus;
+          });
           
-          // widget controls
-          scope.selectRoute = function(tag) {
-              //$log.debug('D:map-controls; selectRoute, selected', tag);
-              bus.toggleRoute(tag);
-          }
-
-/*
-          scope.zoomToStop = function(stopId, coords) {
-              var x, y, k, centered;
-              var feature = {
-                  "type": "Feature",
-                  "geometry": {
-                      "coordinates": coords,
-                      "type": "Point"
-                  }
-              }
-
-              var path = d3.geo.path().projection(render.projection);
-              var centroid = path.centroid(feature);
-              if (scope.stopId !== stopId) {
-                  var x = centroid[0],
-                      y = centroid[1],
-                      k = 2;
-                  scope.stopId = stopId;
-
-                  d3.select('svg')
-                    .select('g')
-                    .transition()
-                    .duration(750)
-                    .attr("transform", "scale(" + k + ") translate(" + -x + "," + -y + ")");
-
-              } else {
-                  scope.stopId = null;
-
-                  d3.select('svg')
-                    .select('g')
-                    .transition()
-                    .duration(750)
-                    .attr("transform", "");
-              }
-
-          }
-*/
-
           scope.selectedRoutes = bus.selectedRoutes;
           scope.$watch('selectedRoutes', function(n,o) {
               if (_.isEmpty(scope.selectedRoutes)) {
@@ -118,6 +77,18 @@ angular.module('challengeApp')
                   });
               }
           }, true);
+
+          // widget controls
+          scope.selectRoute = function(tag) {
+              //$log.debug('D:map-controls; selectRoute, selected', tag);
+              scope.nextBus = null;
+              bus.toggleRoute(tag);
+          }
+
+          scope.getNextBus = function(tag, stopId) {
+              bus.getStopNextBus(tag, stopId);
+          }
+
 
       }
     };

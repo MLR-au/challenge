@@ -25,12 +25,26 @@
                     <div class="col-sm-12 col-md-12 col-lg-12">
                         <h4><a href="" ng-click="selectRoute(route.tag)">{{route.tag}}: {{route.title}}</a></h4>
                         <hr/>
+                        <h5>Next Bus</h5>
+                        <span ng-if="nextBus">
+                            <span ng-if="nextBus.noneScheduled">
+                                <strong>No buses scheduled.</strong>
+                            </span>
+                            <span ng-if="!nextBus.noneScheduled">
+                                <strong>{{nextBus.title}}: </strong>{{nextBus.predictions[0].minutes}} min<br/>
+                                Affected By Layover: {{nextBus.predictions[0].affectedByLayover}}
+                            </span>
+                        </span>
+                        <span ng-if="!nextBus">
+                            Click on a stop to find out when the next bus is due.
+                        </span>
+                        <hr/>
                         <h5>Stops</h5>
                         <ul>
                             <li ng-repeat="stop in route.stops">
-                                <!-- <a href="" ng-click="zoomToStop(stop.stopId, [stop.lon, stop.lat])"> -->
+                                <a href="" ng-click="getNextBus(route.tag, stop.tag)"> 
                                     {{stop.stopId}}, {{stop.title}}
-                                <!-- </a> -->
+                                </a>
                             </li>
                        </ul>
                     </div>

@@ -72,7 +72,7 @@ angular.module('challengeApp')
           var q = [];
 
           // get the locations for all vehicles on all routes
-          angular.forEach(bus.routeTags.slice(0,10), function(v,k) {
+          angular.forEach(bus.routeTags, function(v,k) {
               var routeTag = v;
 
               // we need to know when all the data has been retrieved and since it's asynchronous
@@ -144,6 +144,9 @@ angular.module('challengeApp')
                       var nodes = _.groupBy(getNodes(routeConfigs.nodes[0].outerHTML).nodes, function(d) {
                           return d.localName;
                       });
+
+                      // extract the bounding box of the route
+                      var bbox = get(routeConfigs.nodes[0], [ 'latMin', 'latMax', 'lonMin', 'lonMax' ]);
                       var stops = [], paths = [];
 
                       // get the stop data into a useable form
@@ -161,6 +164,7 @@ angular.module('challengeApp')
                       // stash the data
                       bus.routes[tag].paths = paths;
                       bus.routes[tag].stops = stops;
+                      bus.routes[tag].bbox = bbox;
                       //$log.debug('S:bus-service, toggleRoute, routeData', bus.routes[tag]);
                       
                       // now that we have this path go ahead and render it
@@ -170,7 +174,6 @@ angular.module('challengeApp')
                   // we already have this path so go ahead and render it
                   render.renderPaths(tag, bus.routes[tag].paths);
               }
-
           } else {
               // currently selected so remove it
               bus.selectedRoutes.splice(bus.selectedRoutes.indexOf(tag), 1);
@@ -191,6 +194,7 @@ angular.module('challengeApp')
 
           // toggle bus visibility or not
           render.toggleBusVisibility(bus.selectedRoutes);
+
       }
 
       var bus = {

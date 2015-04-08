@@ -14,6 +14,7 @@ angular.module('challengeApp')
       function renderVehicleLocations(locations) {
 
           var p = d3.select('svg')
+                    .select('g')
                     .selectAll('circle')
                     .data(locations); 
 
@@ -51,6 +52,7 @@ angular.module('challengeApp')
 
           // let d3 do the rest...
           d3.select('svg')
+            .select('g')
             .append('path')
             .datum({ "type": "FeatureCollection", "features": features })
             .attr("class", "bus-routes path_route_" + tag)

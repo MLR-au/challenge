@@ -29,7 +29,8 @@ angular.module('challengeApp')
           d3.select('#map')
             .append('svg')
             .attr('width', width)
-            .attr('height', height);
+            .attr('height', height)
+            .append('g');
           $log.info('SVG appended to div.');
 
           // the available layers - these are in the order we want them retrieved

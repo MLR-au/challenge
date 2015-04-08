@@ -66,12 +66,13 @@ angular.module('challengeApp')
               // transform the projection
               projection.scale(scope.transform.scale).translate(scope.transform.translate);
 
-              // and stash the transformed projection in the render service because we'll need it there
+              // and stash the transformed projection in the render service because we'll need it 
               //  to draw the vehicle locations on the map
               render.projection = projection;
 
               // draw the layer
               d3.select('svg')
+                .select('g')
                 .selectAll('.' + layer.name)
                 .data(features.features)
                 .enter()

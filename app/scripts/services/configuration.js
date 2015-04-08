@@ -9,8 +9,8 @@
  */
 angular.module('challengeApp')
   .constant('configuration', {
-      //'layers': [ 'neighborhoods', 'streets', 'arteries', 'freeways' ],
-      'layers': [ 'neighborhoods' ],
+      'layers': [ 'neighborhoods', 'streets', 'arteries', 'freeways' ],
+      //'layers': [ 'neighborhoods' ],
 
       'colour': d3.scale.category20()
 

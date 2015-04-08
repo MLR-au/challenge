@@ -13,7 +13,6 @@ angular.module('challengeApp')
     function get(layers) {
         if (! _.isArray(layers)) layers = [layers];
 
-        console.log($location.path);
         var layer = layers.shift();
         var p = $location.path();
         if (p !== '/') {
@@ -21,6 +20,7 @@ angular.module('challengeApp')
         } else {
             var url = '/data/topojson/' + layer + '.json';
         }
+        console.log($location.path(), url);
         $http.get(url).then(function(resp) {
             //$log.debug(layer, resp.data);
             $log.info("Getting layer: ", layer);

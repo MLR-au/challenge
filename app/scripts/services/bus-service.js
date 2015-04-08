@@ -169,10 +169,16 @@ angular.module('challengeApp')
                       
                       // now that we have this path go ahead and render it
                       render.renderPaths(tag, bus.routes[tag].paths);
+
+                      // toggle bus visibility or not
+                      render.toggleBusVisibility(bus.selectedRoutes, bus.locations);
                   })
               } else {
                   // we already have this path so go ahead and render it
                   render.renderPaths(tag, bus.routes[tag].paths);
+
+                  // toggle bus visibility or not
+                  render.toggleBusVisibility(bus.selectedRoutes, bus.locations);
               }
           } else {
               // currently selected so remove it
@@ -180,6 +186,9 @@ angular.module('challengeApp')
 
               // since we know a path is drawn; select it and remove it
               d3.selectAll(".path_route_" + tag).remove();
+
+              // toggle bus visibility or not
+              render.toggleBusVisibility(bus.selectedRoutes, bus.locations);
           }
 
           // cycle through the routes toggling on or off as required
@@ -192,8 +201,6 @@ angular.module('challengeApp')
               }
           })
 
-          // toggle bus visibility or not
-          render.toggleBusVisibility(bus.selectedRoutes);
 
       }
 

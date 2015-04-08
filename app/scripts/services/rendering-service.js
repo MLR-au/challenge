@@ -31,7 +31,14 @@ angular.module('challengeApp')
            })
            .attr('r', '6')
            .attr('transform', function(d) { return 'translate(' + render.projection([d.lon, d.lat]) + ')'; })
-           .style('fill', function(d) { return conf.colour(d.routeTag); });
+           .style('fill', function(d) { return conf.colour(d.routeTag); })
+           .style('visibility', function(d) { 
+                if (_.isEmpty(render.selected)) {
+                    return 'visible';
+                } else {
+                    return render.selected.indexOf(d.routeTag) === -1 ? 'hidden' : 'visible'; 
+                }
+           });
       }
 
       // render in the bus paths
@@ -58,28 +65,26 @@ angular.module('challengeApp')
             .attr("class", "bus-routes path_route_" + tag)
             .attr("d", path)
             .style('stroke', '#FF7F0E');
-
       }
 
       // hide / show bus markers based on route selection if any...
-      function toggleBusVisibility(selected) {
-          if (_.isEmpty(selected)) {
-              // no routes selected - ensure all buses visible
-              d3.select('svg')
-                .selectAll('circle')
-                .style('visibility', 'visible');
+      function toggleBusVisibility(selected, locations) {
+          // save selected into this service so when the next update
+          //  happens, we can use it to set new nodes visible or not
+          render.selected = selected;
 
-          } else {
-              // routes selected - show only those buses
-              d3.select('svg')
-                .selectAll('circle')
-                .style('visibility', function(d) { 
-                    return selected.indexOf(d.routeTag) === -1 ? 'hidden' : 'visible'; 
-                });
-          }
+          // remove all nodes
+          d3.select('svg')
+            .selectAll('circle')
+            .remove();
+
+          // trigger re-render - visibility handled as part of that process
+          render.renderVehicleLocations(locations);
+
       }
 
       var render = {
+          selected: [],
           renderVehicleLocations: renderVehicleLocations,
           renderPaths: renderPaths,
           toggleBusVisibility: toggleBusVisibility,
